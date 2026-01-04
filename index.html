@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/x-icon" href="./fav.ico" />
         <title>Kolb Learning Style Inventory</title>
         <style>
             * {
@@ -214,6 +215,18 @@
                 color: white;
                 transform: scale(1.05);
                 box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            }
+
+            .rank-btn:disabled {
+                background: #f1f5f9;
+                border-color: #e2e8f0;
+                color: #cbd5e1;
+                cursor: not-allowed;
+            }
+
+            .rank-btn:disabled:hover {
+                border-color: #e2e8f0;
+                color: #cbd5e1;
             }
 
             /* Error Message */
@@ -505,6 +518,23 @@
             .btn-reset:hover {
                 background: #e2e8f0;
             }
+
+            /* Paper Link */
+            .paper-link {
+                display: block;
+                text-align: right;
+                margin-top: 1rem;
+                font-size: 0.875rem;
+                color: #6366f1;
+                text-decoration: none;
+                opacity: 0.8;
+                transition: opacity 0.2s;
+            }
+
+            .paper-link:hover {
+                opacity: 1;
+                text-decoration: underline;
+            }
         </style>
     </head>
     <body>
@@ -690,6 +720,15 @@
                     </button>
                 </div>
             </div>
+
+            <a
+                href="https://aim.stanford.edu/wp-content/uploads/2013/05/Kolb-Learning-Style-Inventory.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="paper-link"
+            >
+                Read the original Kolb paper
+            </a>
         </div>
 
         <script>
@@ -1078,6 +1117,16 @@
                 ranks[wordIndex] = rank;
             }
 
+            // Check if a rank is used by another word (not the current one)
+            function isRankUsedByOther(ranks, wordIndex, rank) {
+                for (let i = 0; i < 4; i++) {
+                    if (i !== wordIndex && ranks[i] === rank) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             function renderQuestion() {
                 const q = questions[currentQuestion];
                 const ranks = getRanks(q.id);
@@ -1095,14 +1144,22 @@
                             </div>
                             <div class="rank-buttons">
                                 ${[1, 2, 3, 4]
-                                    .map(
-                                        (rank) => `
-                                        <button class="rank-btn ${ranks[wordIndex] === rank ? "selected" : ""}"
-                                                onclick="handleRankSelection(${q.id}, ${wordIndex}, ${rank})">
-                                            ${rank}
-                                        </button>
-                                        `,
-                                    )
+                                    .map((rank) => {
+                                        const isSelected =
+                                            ranks[wordIndex] === rank;
+                                        const isUsed = isRankUsedByOther(
+                                            ranks,
+                                            wordIndex,
+                                            rank,
+                                        );
+                                        return `
+                                            <button class="rank-btn ${isSelected ? "selected" : ""}"
+                                                    onclick="handleRankSelection(${q.id}, ${wordIndex}, ${rank})"
+                                                    ${isUsed ? "disabled" : ""}>
+                                                ${rank}
+                                            </button>
+                                            `;
+                                    })
                                     .join("")}
                             </div>
                         </div>
