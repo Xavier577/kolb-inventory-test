@@ -1,0 +1,1 @@
+# klob-inventory-test
