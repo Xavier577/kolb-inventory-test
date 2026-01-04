@@ -1,0 +1,1438 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Kolb Learning Style Inventory</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Oxygen, Ubuntu, sans-serif;
+                background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+                min-height: 100vh;
+                padding: 2rem 1rem;
+                line-height: 1.6;
+            }
+
+            .container {
+                max-width: 700px;
+                margin: 0 auto;
+            }
+
+            .card {
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+                padding: 2rem;
+            }
+
+            h1 {
+                text-align: center;
+                color: #1e293b;
+                font-size: 1.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .subtitle {
+                text-align: center;
+                color: #64748b;
+                margin-bottom: 1.5rem;
+            }
+
+            /* Progress Bar */
+            .progress-container {
+                margin-bottom: 2rem;
+            }
+
+            .progress-info {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.875rem;
+                color: #64748b;
+                margin-bottom: 0.5rem;
+            }
+
+            .progress-bar {
+                height: 8px;
+                background: #e2e8f0;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #6366f1, #8b5cf6);
+                border-radius: 4px;
+                transition: width 0.3s ease;
+            }
+
+            /* Instructions */
+            .instructions {
+                background: #eef2ff;
+                border-radius: 0.75rem;
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .instructions h2 {
+                color: #3730a3;
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .instructions p {
+                color: #4338ca;
+                font-size: 0.875rem;
+            }
+
+            /* Word Items */
+            .word-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .word-item {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1rem 1.25rem;
+                background: #f8fafc;
+                border-radius: 0.75rem;
+                transition: background 0.2s;
+            }
+
+            .word-item:hover {
+                background: #f1f5f9;
+            }
+
+            .word-label {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: 500;
+                color: #334155;
+                text-transform: capitalize;
+            }
+
+            /* Tooltip */
+            .info-icon {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                height: 18px;
+                background: #cbd5e1;
+                color: white;
+                border-radius: 50%;
+                font-size: 11px;
+                font-weight: 700;
+                cursor: help;
+                flex-shrink: 0;
+            }
+
+            .info-icon:hover {
+                background: #6366f1;
+            }
+
+            .tooltip {
+                position: absolute;
+                bottom: calc(100% + 8px);
+                left: 50%;
+                transform: translateX(-50%);
+                background: #1e293b;
+                color: white;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                font-size: 0.8rem;
+                font-weight: 400;
+                width: 220px;
+                text-align: left;
+                text-transform: none;
+                opacity: 0;
+                visibility: hidden;
+                transition:
+                    opacity 0.2s,
+                    visibility 0.2s;
+                z-index: 100;
+                line-height: 1.5;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+
+            .tooltip::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 6px solid transparent;
+                border-top-color: #1e293b;
+            }
+
+            .info-icon:hover .tooltip {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            /* Rank Buttons */
+            .rank-buttons {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .rank-btn {
+                width: 40px;
+                height: 40px;
+                border: 2px solid #e2e8f0;
+                background: white;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                font-size: 1rem;
+                color: #64748b;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .rank-btn:hover {
+                border-color: #a5b4fc;
+                color: #6366f1;
+            }
+
+            .rank-btn.selected {
+                background: #6366f1;
+                border-color: #6366f1;
+                color: white;
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            }
+
+            /* Error Message */
+            .error {
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                color: #dc2626;
+                padding: 0.75rem 1rem;
+                border-radius: 0.75rem;
+                margin-bottom: 1.5rem;
+                font-size: 0.875rem;
+                display: none;
+            }
+
+            .error.show {
+                display: block;
+            }
+
+            /* Navigation Buttons */
+            .nav-buttons {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .btn {
+                flex: 1;
+                padding: 0.875rem 1.5rem;
+                border: none;
+                border-radius: 0.75rem;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .btn-secondary {
+                background: #f1f5f9;
+                color: #475569;
+            }
+
+            .btn-secondary:hover:not(:disabled) {
+                background: #e2e8f0;
+            }
+
+            .btn-secondary:disabled {
+                color: #94a3b8;
+                cursor: not-allowed;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            }
+
+            .btn-success {
+                background: linear-gradient(135deg, #22c55e, #16a34a);
+                color: white;
+            }
+
+            .btn-success:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+            }
+
+            /* Question Dots */
+            .question-dots {
+                display: flex;
+                justify-content: center;
+                gap: 0.375rem;
+                margin-top: 1.5rem;
+            }
+
+            .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: #cbd5e1;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .dot.active {
+                background: #6366f1;
+                transform: scale(1.3);
+            }
+
+            .dot.complete {
+                background: #22c55e;
+            }
+
+            /* Results Page */
+            .results-container {
+                display: none;
+            }
+
+            .results-container.show {
+                display: block;
+            }
+
+            .questionnaire {
+                display: block;
+            }
+
+            .questionnaire.hide {
+                display: none;
+            }
+
+            .charts-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            @media (max-width: 640px) {
+                .charts-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .chart-section h2 {
+                font-size: 1rem;
+                color: #475569;
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+
+            .chart-svg {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+                display: block;
+            }
+
+            .quadrant-info {
+                text-align: center;
+                margin-top: 1rem;
+                font-size: 0.875rem;
+                color: #64748b;
+            }
+
+            /* Style Result Box */
+            .style-result {
+                background: linear-gradient(135deg, #eef2ff, #faf5ff);
+                border-radius: 1rem;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .style-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .style-dot {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+            }
+
+            .style-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+            }
+
+            .style-description {
+                color: #475569;
+                margin-bottom: 1rem;
+            }
+
+            .style-preference {
+                color: #64748b;
+                font-style: italic;
+                font-size: 0.9rem;
+            }
+
+            /* Scores Grid */
+            .scores-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            @media (max-width: 640px) {
+                .scores-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .scores-card {
+                background: #f8fafc;
+                border-radius: 0.75rem;
+                padding: 1.25rem;
+            }
+
+            .scores-card h3 {
+                font-size: 1rem;
+                color: #334155;
+                margin-bottom: 1rem;
+            }
+
+            .score-item {
+                margin-bottom: 1rem;
+            }
+
+            .score-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .score-label {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.8rem;
+                color: #64748b;
+                margin-bottom: 0.375rem;
+            }
+
+            .score-label span:last-child {
+                font-weight: 600;
+                color: #334155;
+            }
+
+            .score-bar {
+                height: 8px;
+                background: #e2e8f0;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .score-fill {
+                height: 100%;
+                border-radius: 4px;
+                transition: width 0.5s ease;
+            }
+
+            /* Strengths List */
+            .strengths-list {
+                list-style: none;
+            }
+
+            .strengths-list li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: #475569;
+                margin-bottom: 0.625rem;
+                font-size: 0.9rem;
+            }
+
+            .check-icon {
+                color: #22c55e;
+                font-weight: bold;
+            }
+
+            /* Note Box */
+            .note-box {
+                background: #fefce8;
+                border: 1px solid #fde047;
+                border-radius: 0.75rem;
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .note-box h3 {
+                color: #a16207;
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .note-box p {
+                color: #a16207;
+                font-size: 0.875rem;
+            }
+
+            .btn-reset {
+                width: 100%;
+                background: #f1f5f9;
+                color: #475569;
+            }
+
+            .btn-reset:hover {
+                background: #e2e8f0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="card">
+                <!-- Questionnaire Section -->
+                <div class="questionnaire" id="questionnaire">
+                    <h1>Kolb Learning Style Inventory</h1>
+                    <p class="subtitle">Discover how you learn best</p>
+
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <span
+                                >Question <span id="currentQ">1</span> of
+                                10</span
+                            >
+                            <span
+                                ><span id="progressPercent">10</span>%
+                                complete</span
+                            >
+                        </div>
+                        <div class="progress-bar">
+                            <div
+                                class="progress-fill"
+                                id="progressFill"
+                                style="width: 10%"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="instructions">
+                        <h2>Instructions</h2>
+                        <p>
+                            Rank each of the four words below from
+                            <strong>4</strong> (most like you) to
+                            <strong>1</strong> (least like you). Use each number
+                            exactly once—no ties allowed.
+                        </p>
+                    </div>
+
+                    <div class="word-list" id="wordList">
+                        <!-- Words will be populated by JavaScript -->
+                    </div>
+
+                    <div class="error" id="errorMsg">
+                        Please rank all four words (use each number 1-4 exactly
+                        once)
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="btn btn-secondary" id="prevBtn" disabled>
+                            Previous
+                        </button>
+                        <button class="btn btn-primary" id="nextBtn">
+                            Next
+                        </button>
+                    </div>
+
+                    <div class="question-dots" id="questionDots">
+                        <!-- Dots will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-container" id="results">
+                    <h1>Your Learning Style Profile</h1>
+                    <p class="subtitle">
+                        Based on Kolb's Experiential Learning Model
+                    </p>
+
+                    <div class="charts-grid">
+                        <div class="chart-section">
+                            <h2>Radar Profile</h2>
+                            <svg
+                                id="radarChart"
+                                class="chart-svg"
+                                viewBox="0 0 300 300"
+                            ></svg>
+                        </div>
+                        <div class="chart-section">
+                            <h2>Style Quadrant</h2>
+                            <svg
+                                id="quadrantChart"
+                                class="chart-svg"
+                                viewBox="0 0 280 280"
+                            ></svg>
+                            <div class="quadrant-info">
+                                <div>AC - CE = <span id="acCeVal">0</span></div>
+                                <div>AE - RO = <span id="aeRoVal">0</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="style-result" id="styleResult">
+                        <div class="style-header">
+                            <div class="style-dot" id="styleDot"></div>
+                            <div class="style-title" id="styleTitle">
+                                Your Dominant Style:
+                            </div>
+                        </div>
+                        <p class="style-description" id="styleDescription"></p>
+                        <p class="style-preference" id="stylePreference"></p>
+                    </div>
+
+                    <div class="scores-grid">
+                        <div class="scores-card">
+                            <h3>Your Dimension Scores</h3>
+                            <div class="score-item">
+                                <div class="score-label">
+                                    <span>Concrete Experience (CE)</span>
+                                    <span id="ceScore">0</span>/40
+                                </div>
+                                <div class="score-bar">
+                                    <div
+                                        class="score-fill"
+                                        id="ceFill"
+                                        style="background: #ef4444; width: 0%"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">
+                                    <span>Reflective Observation (RO)</span>
+                                    <span id="roScore">0</span>/40
+                                </div>
+                                <div class="score-bar">
+                                    <div
+                                        class="score-fill"
+                                        id="roFill"
+                                        style="background: #6366f1; width: 0%"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">
+                                    <span>Abstract Conceptualization (AC)</span>
+                                    <span id="acScore">0</span>/40
+                                </div>
+                                <div class="score-bar">
+                                    <div
+                                        class="score-fill"
+                                        id="acFill"
+                                        style="background: #14b8a6; width: 0%"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div class="score-item">
+                                <div class="score-label">
+                                    <span>Active Experimentation (AE)</span>
+                                    <span id="aeScore">0</span>/40
+                                </div>
+                                <div class="score-bar">
+                                    <div
+                                        class="score-fill"
+                                        id="aeFill"
+                                        style="background: #f59e0b; width: 0%"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scores-card">
+                            <h3>Your Key Strengths</h3>
+                            <ul class="strengths-list" id="strengthsList">
+                                <!-- Populated by JavaScript -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="note-box">
+                        <h3>Remember</h3>
+                        <p>
+                            Your learning style describes how you learn, not how
+                            well you learn. No particular style is intrinsically
+                            better or worse than another—only different.
+                            Understanding your style can help you communicate
+                            more effectively and identify areas for growth.
+                        </p>
+                    </div>
+
+                    <button class="btn btn-reset" id="resetBtn">
+                        Take the Inventory Again
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Question data with word tooltips
+            const questions = [
+                {
+                    id: 1,
+                    words: [
+                        {
+                            text: "involved",
+                            tooltip:
+                                "You prefer to be fully engaged and immersed in experiences, participating actively rather than standing back.",
+                        },
+                        {
+                            text: "tentative",
+                            tooltip:
+                                "You like to hold back judgment, staying open to different possibilities before committing to a conclusion.",
+                        },
+                        {
+                            text: "discriminating",
+                            tooltip:
+                                "You carefully distinguish between options, analyzing differences and making precise distinctions.",
+                        },
+                        {
+                            text: "practical",
+                            tooltip:
+                                "You focus on what works in real-world situations, valuing usefulness and applicability.",
+                        },
+                    ],
+                },
+                {
+                    id: 2,
+                    words: [
+                        {
+                            text: "receptive",
+                            tooltip:
+                                "You are open to new ideas and experiences, willing to take in information from your surroundings.",
+                        },
+                        {
+                            text: "impartial",
+                            tooltip:
+                                "You observe without bias, considering all sides of a situation objectively.",
+                        },
+                        {
+                            text: "analytical",
+                            tooltip:
+                                "You break down complex information into parts, examining each element systematically.",
+                        },
+                        {
+                            text: "relevant",
+                            tooltip:
+                                "You focus on what matters and applies directly to the situation at hand.",
+                        },
+                    ],
+                },
+                {
+                    id: 3,
+                    words: [
+                        {
+                            text: "feeling",
+                            tooltip:
+                                "You rely on emotions and gut reactions to understand and respond to situations.",
+                        },
+                        {
+                            text: "watching",
+                            tooltip:
+                                "You prefer to observe carefully before acting, taking time to understand what's happening.",
+                        },
+                        {
+                            text: "thinking",
+                            tooltip:
+                                "You use logic and rational analysis to make sense of information and situations.",
+                        },
+                        {
+                            text: "doing",
+                            tooltip:
+                                "You learn best by taking action and engaging directly with tasks and challenges.",
+                        },
+                    ],
+                },
+                {
+                    id: 4,
+                    words: [
+                        {
+                            text: "accepting",
+                            tooltip:
+                                "You are open to experiences as they come, embracing situations without resistance.",
+                        },
+                        {
+                            text: "aware",
+                            tooltip:
+                                "You pay close attention to details and nuances, noticing things others might miss.",
+                        },
+                        {
+                            text: "evaluating",
+                            tooltip:
+                                "You assess and judge the value or quality of ideas, making critical determinations.",
+                        },
+                        {
+                            text: "risk-taker",
+                            tooltip:
+                                "You're willing to try new things and take chances, even with uncertain outcomes.",
+                        },
+                    ],
+                },
+                {
+                    id: 5,
+                    words: [
+                        {
+                            text: "intuitive",
+                            tooltip:
+                                "You trust your instincts and inner sense of knowing, often without conscious reasoning.",
+                        },
+                        {
+                            text: "questioning",
+                            tooltip:
+                                'You probe and inquire, seeking to understand the "why" behind things.',
+                        },
+                        {
+                            text: "logical",
+                            tooltip:
+                                "You follow systematic reasoning, building conclusions step by step from evidence.",
+                        },
+                        {
+                            text: "productive",
+                            tooltip:
+                                "You focus on getting results and accomplishing tangible outcomes.",
+                        },
+                    ],
+                },
+                {
+                    id: 6,
+                    words: [
+                        {
+                            text: "concrete",
+                            tooltip:
+                                "You prefer dealing with real, tangible things rather than abstract theories.",
+                        },
+                        {
+                            text: "observing",
+                            tooltip:
+                                "You learn by watching and reflecting on what you see around you.",
+                        },
+                        {
+                            text: "abstract",
+                            tooltip:
+                                "You enjoy working with concepts, theories, and ideas that exist beyond physical reality.",
+                        },
+                        {
+                            text: "active",
+                            tooltip:
+                                "You engage directly with the world, preferring action over passive learning.",
+                        },
+                    ],
+                },
+                {
+                    id: 7,
+                    words: [
+                        {
+                            text: "present-oriented",
+                            tooltip:
+                                "You focus on the here and now, dealing with immediate experiences and situations.",
+                        },
+                        {
+                            text: "reflecting",
+                            tooltip:
+                                "You take time to think deeply about experiences, considering their meaning.",
+                        },
+                        {
+                            text: "future-oriented",
+                            tooltip:
+                                "You think ahead, planning and considering long-term implications and possibilities.",
+                        },
+                        {
+                            text: "pragmatic",
+                            tooltip:
+                                "You focus on practical solutions that work, regardless of theoretical elegance.",
+                        },
+                    ],
+                },
+                {
+                    id: 8,
+                    words: [
+                        {
+                            text: "open to new experiences",
+                            tooltip:
+                                "You embrace novelty and variety, seeking out unfamiliar situations to learn from.",
+                        },
+                        {
+                            text: "perceptive",
+                            tooltip:
+                                "You quickly pick up on subtleties and underlying meanings in what you observe.",
+                        },
+                        {
+                            text: "intelligent",
+                            tooltip:
+                                "You value mental capability and the ability to understand complex concepts.",
+                        },
+                        {
+                            text: "competent",
+                            tooltip:
+                                "You value skill and the ability to perform tasks effectively and efficiently.",
+                        },
+                    ],
+                },
+                {
+                    id: 9,
+                    words: [
+                        {
+                            text: "experience",
+                            tooltip:
+                                "You learn best through direct, hands-on involvement with real situations.",
+                        },
+                        {
+                            text: "observation",
+                            tooltip:
+                                "You learn by watching, listening, and reflecting on what you perceive.",
+                        },
+                        {
+                            text: "conceptualization",
+                            tooltip:
+                                "You learn by forming theories and abstract models to explain phenomena.",
+                        },
+                        {
+                            text: "experimentation",
+                            tooltip:
+                                "You learn by testing ideas in practice, trying things out to see what happens.",
+                        },
+                    ],
+                },
+                {
+                    id: 10,
+                    words: [
+                        {
+                            text: "intense",
+                            tooltip:
+                                "You engage deeply and emotionally with experiences, feeling things strongly.",
+                        },
+                        {
+                            text: "reserved",
+                            tooltip:
+                                "You hold back, preferring to process internally before expressing yourself.",
+                        },
+                        {
+                            text: "rational",
+                            tooltip:
+                                "You approach situations with reason and logic, setting aside emotional reactions.",
+                        },
+                        {
+                            text: "responsible",
+                            tooltip:
+                                "You take ownership of tasks and follow through on commitments reliably.",
+                        },
+                    ],
+                },
+            ];
+
+            const learningStyles = {
+                Divergent: {
+                    color: "#6366f1",
+                    description:
+                        "Your learning style emphasizes concrete experience and reflective observation. Your greatest strength lies in imaginative ability and awareness of meaning and values.",
+                    strengths: [
+                        "Viewing situations from many perspectives",
+                        "Brainstorming and generating ideas",
+                        "Understanding people",
+                        "Recognizing problems",
+                    ],
+                    preference:
+                        "You prefer socio-emotional experiences over task accomplishment and excel in situations that call for generation of alternative ideas.",
+                },
+                Assimilative: {
+                    color: "#14b8a6",
+                    description:
+                        "Your dominant learning abilities are abstract conceptualization and reflective observation. Your greatest strength lies in inductive reasoning and creating theoretical models.",
+                    strengths: [
+                        "Creating theoretical models",
+                        "Inductive reasoning",
+                        "Defining problems",
+                        "Developing theories",
+                    ],
+                    preference:
+                        "You value ideas for being logically sound and precise rather than for their practical value. You focus more on ideas and abstract concepts than socio-emotional interactions.",
+                },
+                Convergent: {
+                    color: "#f59e0b",
+                    description:
+                        "Your learning style relies primarily on abstract conceptualization and active experimentation. Your greatest strength lies in problem solving and practical application of ideas.",
+                    strengths: [
+                        "Problem solving",
+                        "Decision making",
+                        "Practical application of ideas",
+                        "Hypothetical-deductive reasoning",
+                    ],
+                    preference:
+                        "You work best in situations where there is a single correct answer or solution. You prefer task accomplishment over socio-emotional experiences.",
+                },
+                Accommodative: {
+                    color: "#ef4444",
+                    description:
+                        "Your learning style emphasizes concrete experience and active experimentation. Your greatest strength lies in doing things and getting involved in new experiences.",
+                    strengths: [
+                        "Carrying out plans",
+                        "Taking risks",
+                        "Seeking opportunities",
+                        "Adapting to circumstances",
+                    ],
+                    preference:
+                        "You are best suited for situations where you must adapt to changing circumstances. When theory doesn't fit facts, you'll discard the theory and act.",
+                },
+            };
+
+            // State
+            let currentQuestion = 0;
+            let answers = {};
+
+            // DOM Elements
+            const questionnaireEl = document.getElementById("questionnaire");
+            const resultsEl = document.getElementById("results");
+            const wordListEl = document.getElementById("wordList");
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+            const errorMsg = document.getElementById("errorMsg");
+            const questionDots = document.getElementById("questionDots");
+            const currentQEl = document.getElementById("currentQ");
+            const progressPercent = document.getElementById("progressPercent");
+            const progressFill = document.getElementById("progressFill");
+            const resetBtn = document.getElementById("resetBtn");
+
+            // Initialize
+            function init() {
+                renderDots();
+                renderQuestion();
+                setupEventListeners();
+            }
+
+            function renderDots() {
+                questionDots.innerHTML = "";
+                for (let i = 0; i < questions.length; i++) {
+                    const dot = document.createElement("div");
+                    dot.className = "dot";
+                    dot.addEventListener("click", () => goToQuestion(i));
+                    questionDots.appendChild(dot);
+                }
+                updateDots();
+            }
+
+            function updateDots() {
+                const dots = questionDots.querySelectorAll(".dot");
+                dots.forEach((dot, i) => {
+                    dot.classList.remove("active", "complete");
+                    if (i === currentQuestion) {
+                        dot.classList.add("active");
+                    } else if (isQuestionComplete(i)) {
+                        dot.classList.add("complete");
+                    }
+                });
+            }
+
+            // Get ranks for a question, ensuring we always have a valid array
+            function getRanks(questionId) {
+                if (!answers[questionId]) {
+                    answers[questionId] = [0, 0, 0, 0];
+                }
+                return answers[questionId];
+            }
+
+            // Set a rank for a specific word, clearing that rank from other words
+            function setRank(questionId, wordIndex, rank) {
+                const ranks = getRanks(questionId);
+
+                // If clicking the same rank that's already selected, deselect it
+                if (ranks[wordIndex] === rank) {
+                    ranks[wordIndex] = 0;
+                    return;
+                }
+
+                // Clear this rank from any other word that has it
+                for (let i = 0; i < 4; i++) {
+                    if (ranks[i] === rank) {
+                        ranks[i] = 0;
+                    }
+                }
+
+                // Assign the rank to this word
+                ranks[wordIndex] = rank;
+            }
+
+            function renderQuestion() {
+                const q = questions[currentQuestion];
+                const ranks = getRanks(q.id);
+
+                wordListEl.innerHTML = q.words
+                    .map(
+                        (word, wordIndex) => `
+                        <div class="word-item">
+                            <div class="word-label">
+                                ${word.text}
+                                <div class="info-icon">
+                                    i
+                                    <div class="tooltip">${word.tooltip}</div>
+                                </div>
+                            </div>
+                            <div class="rank-buttons">
+                                ${[1, 2, 3, 4]
+                                    .map(
+                                        (rank) => `
+                                        <button class="rank-btn ${ranks[wordIndex] === rank ? "selected" : ""}"
+                                                onclick="handleRankSelection(${q.id}, ${wordIndex}, ${rank})">
+                                            ${rank}
+                                        </button>
+                                        `,
+                                    )
+                                    .join("")}
+                            </div>
+                        </div>
+                        `,
+                    )
+                    .join("");
+
+                updateProgress();
+                updateButtons();
+                updateDots();
+                hideError();
+            }
+
+            function handleRankSelection(questionId, wordIndex, rank) {
+                setRank(questionId, wordIndex, rank);
+                renderQuestion();
+            }
+
+            function updateProgress() {
+                const progress =
+                    ((currentQuestion + 1) / questions.length) * 100;
+                currentQEl.textContent = currentQuestion + 1;
+                progressPercent.textContent = Math.round(progress);
+                progressFill.style.width = `${progress}%`;
+            }
+
+            function updateButtons() {
+                prevBtn.disabled = currentQuestion === 0;
+
+                if (currentQuestion === questions.length - 1) {
+                    nextBtn.textContent = "View Results";
+                    nextBtn.className = "btn btn-success";
+                } else {
+                    nextBtn.textContent = "Next";
+                    nextBtn.className = "btn btn-primary";
+                }
+            }
+
+            function isQuestionComplete(qIndex) {
+                const q = questions[qIndex];
+                const ranks = answers[q.id] || [0, 0, 0, 0];
+                const nonZero = ranks.filter((r) => r > 0);
+                const unique = new Set(nonZero);
+                return (
+                    nonZero.length === 4 &&
+                    unique.size === 4 &&
+                    [1, 2, 3, 4].every((n) => ranks.includes(n))
+                );
+            }
+
+            function allQuestionsComplete() {
+                return questions.every((_, i) => isQuestionComplete(i));
+            }
+
+            function showError(msg) {
+                errorMsg.textContent = msg;
+                errorMsg.classList.add("show");
+            }
+
+            function hideError() {
+                errorMsg.classList.remove("show");
+            }
+
+            function goToQuestion(index) {
+                currentQuestion = index;
+                renderQuestion();
+            }
+
+            function setupEventListeners() {
+                prevBtn.addEventListener("click", () => {
+                    if (currentQuestion > 0) {
+                        currentQuestion--;
+                        renderQuestion();
+                    }
+                });
+
+                nextBtn.addEventListener("click", () => {
+                    if (!isQuestionComplete(currentQuestion)) {
+                        showError(
+                            "Please rank all four words (use each number 1-4 exactly once)",
+                        );
+                        return;
+                    }
+
+                    if (currentQuestion < questions.length - 1) {
+                        currentQuestion++;
+                        renderQuestion();
+                    } else {
+                        if (!allQuestionsComplete()) {
+                            showError(
+                                "Please complete all questions before viewing results",
+                            );
+                            return;
+                        }
+                        showResults();
+                    }
+                });
+
+                resetBtn.addEventListener("click", () => {
+                    answers = {};
+                    currentQuestion = 0;
+                    questionnaireEl.classList.remove("hide");
+                    resultsEl.classList.remove("show");
+                    renderQuestion();
+                });
+            }
+
+            function calculateScores() {
+                let CE = 0,
+                    RO = 0,
+                    AC = 0,
+                    AE = 0;
+
+                questions.forEach((q) => {
+                    const ranks = answers[q.id] || [0, 0, 0, 0];
+                    CE += ranks[0];
+                    RO += ranks[1];
+                    AC += ranks[2];
+                    AE += ranks[3];
+                });
+
+                return { CE, RO, AC, AE };
+            }
+
+            function getDominantStyle(scores) {
+                const acMinusCe = scores.AC - scores.CE;
+                const aeMinusRo = scores.AE - scores.RO;
+
+                if (acMinusCe <= 0 && aeMinusRo <= 0) return "Accommodative";
+                if (acMinusCe <= 0 && aeMinusRo > 0) return "Divergent";
+                if (acMinusCe > 0 && aeMinusRo <= 0) return "Convergent";
+                return "Assimilative";
+            }
+
+            function showResults() {
+                questionnaireEl.classList.add("hide");
+                resultsEl.classList.add("show");
+
+                const scores = calculateScores();
+                const dominantStyle = getDominantStyle(scores);
+                const style = learningStyles[dominantStyle];
+
+                // Update scores display
+                document.getElementById("ceScore").textContent = scores.CE;
+                document.getElementById("roScore").textContent = scores.RO;
+                document.getElementById("acScore").textContent = scores.AC;
+                document.getElementById("aeScore").textContent = scores.AE;
+
+                document.getElementById("ceFill").style.width =
+                    `${((scores.CE - 10) / 30) * 100}%`;
+                document.getElementById("roFill").style.width =
+                    `${((scores.RO - 10) / 30) * 100}%`;
+                document.getElementById("acFill").style.width =
+                    `${((scores.AC - 10) / 30) * 100}%`;
+                document.getElementById("aeFill").style.width =
+                    `${((scores.AE - 10) / 30) * 100}%`;
+
+                // Update quadrant values
+                document.getElementById("acCeVal").textContent =
+                    scores.AC - scores.CE;
+                document.getElementById("aeRoVal").textContent =
+                    scores.AE - scores.RO;
+
+                // Update style info
+                document.getElementById("styleDot").style.background =
+                    style.color;
+                document.getElementById("styleTitle").textContent =
+                    `Your Dominant Style: ${dominantStyle}`;
+                document.getElementById("styleTitle").style.color = style.color;
+                document.getElementById("styleDescription").textContent =
+                    style.description;
+                document.getElementById("stylePreference").textContent =
+                    style.preference;
+
+                // Update strengths
+                const strengthsList = document.getElementById("strengthsList");
+                strengthsList.innerHTML = style.strengths
+                    .map(
+                        (s) => `
+        <li><span class="check-icon">✓</span> ${s}</li>
+      `,
+                    )
+                    .join("");
+
+                // Draw charts
+                drawRadarChart(scores);
+                drawQuadrantChart(scores, dominantStyle);
+            }
+
+            function drawRadarChart(scores) {
+                const svg = document.getElementById("radarChart");
+                const size = 300;
+                const center = size / 2;
+                const maxScore = 40;
+                const minScore = 10;
+                const range = maxScore - minScore;
+
+                const normalize = (score) =>
+                    ((score - minScore) / range) * (center - 50);
+
+                const axes = [
+                    { label: "CE", angle: -90, score: scores.CE },
+                    { label: "RO", angle: 0, score: scores.RO },
+                    { label: "AC", angle: 90, score: scores.AC },
+                    { label: "AE", angle: 180, score: scores.AE },
+                ];
+
+                const getPoint = (angle, distance) => {
+                    const radian = (angle * Math.PI) / 180;
+                    return {
+                        x: center + distance * Math.cos(radian),
+                        y: center + distance * Math.sin(radian),
+                    };
+                };
+
+                const dataPoints = axes.map((axis) =>
+                    getPoint(axis.angle, normalize(axis.score)),
+                );
+
+                svg.innerHTML = `
+        <!-- Quadrant backgrounds -->
+        <path d="M ${center} ${center} L ${center} 0 A ${center} ${center} 0 0 0 0 ${center} Z" fill="#ef444420" />
+        <path d="M ${center} ${center} L 0 ${center} A ${center} ${center} 0 0 0 ${center} ${size} Z" fill="#f59e0b20" />
+        <path d="M ${center} ${center} L ${center} ${size} A ${center} ${center} 0 0 0 ${size} ${center} Z" fill="#14b8a620" />
+        <path d="M ${center} ${center} L ${size} ${center} A ${center} ${center} 0 0 0 ${center} 0 Z" fill="#6366f120" />
+
+        <!-- Quadrant labels -->
+        <text x="${center / 2 - 10}" y="${center / 2}" font-size="10" fill="#ef4444" font-weight="600" text-anchor="middle">Accommodative</text>
+        <text x="${center / 2 - 10}" y="${center + center / 2}" font-size="10" fill="#f59e0b" font-weight="600" text-anchor="middle">Convergent</text>
+        <text x="${center + center / 2 + 10}" y="${center + center / 2}" font-size="10" fill="#14b8a6" font-weight="600" text-anchor="middle">Assimilative</text>
+        <text x="${center + center / 2 + 10}" y="${center / 2}" font-size="10" fill="#6366f1" font-weight="600" text-anchor="middle">Divergent</text>
+
+        <!-- Grid circles -->
+        ${[10, 17.5, 25, 32.5, 40]
+            .map(
+                (level, i) => `
+          <circle cx="${center}" cy="${center}" r="${normalize(level)}" fill="none" stroke="#cbd5e1" stroke-width="1" ${i < 4 ? 'stroke-dasharray="3,3"' : ""} />
+        `,
+            )
+            .join("")}
+
+        <!-- Axes -->
+        ${axes
+            .map((axis) => {
+                const end = getPoint(axis.angle, center - 50);
+                return `<line x1="${center}" y1="${center}" x2="${end.x}" y2="${end.y}" stroke="#94a3b8" stroke-width="1.5" />`;
+            })
+            .join("")}
+
+        <!-- Data polygon -->
+        <path d="M ${dataPoints.map((p, i) => `${i === 0 ? "" : "L"} ${p.x} ${p.y}`).join(" ")} Z"
+              fill="rgba(99, 102, 241, 0.3)" stroke="#6366f1" stroke-width="2.5" />
+
+        <!-- Data points -->
+        ${dataPoints
+            .map(
+                (p) => `
+          <circle cx="${p.x}" cy="${p.y}" r="6" fill="#6366f1" stroke="white" stroke-width="2" />
+        `,
+            )
+            .join("")}
+
+        <!-- Axis labels -->
+        ${axes
+            .map((axis) => {
+                const labelPos = getPoint(axis.angle, center - 20);
+                const textAnchor =
+                    axis.angle === 0
+                        ? "start"
+                        : axis.angle === 180
+                          ? "end"
+                          : "middle";
+                const dy = axis.angle === -90 ? -5 : axis.angle === 90 ? 15 : 4;
+                return `<text x="${labelPos.x}" y="${labelPos.y + dy}" font-size="12" font-weight="700" fill="#1e293b" text-anchor="${textAnchor}">${axis.label}: ${axis.score}</text>`;
+            })
+            .join("")}
+      `;
+            }
+
+            function drawQuadrantChart(scores, dominantStyle) {
+                const svg = document.getElementById("quadrantChart");
+                const acMinusCe = scores.AC - scores.CE;
+                const aeMinusRo = scores.AE - scores.RO;
+
+                const size = 280;
+                const center = size / 2;
+                const scale = 3;
+
+                const plotX = Math.max(
+                    10,
+                    Math.min(size - 10, center + aeMinusRo * scale),
+                );
+                const plotY = Math.max(
+                    10,
+                    Math.min(size - 10, center - acMinusCe * scale),
+                );
+
+                const styleColor = learningStyles[dominantStyle].color;
+
+                svg.innerHTML = `
+        <!-- Quadrant backgrounds -->
+        <rect x="0" y="0" width="${center}" height="${center}" fill="#ef444420" />
+        <rect x="${center}" y="0" width="${center}" height="${center}" fill="#6366f120" />
+        <rect x="0" y="${center}" width="${center}" height="${center}" fill="#f59e0b20" />
+        <rect x="${center}" y="${center}" width="${center}" height="${center}" fill="#14b8a620" />
+
+        <!-- Grid lines -->
+        <line x1="${center}" y1="0" x2="${center}" y2="${size}" stroke="#64748b" stroke-width="2" />
+        <line x1="0" y1="${center}" x2="${size}" y2="${center}" stroke="#64748b" stroke-width="2" />
+
+        <!-- Axis labels -->
+        <text x="${center}" y="14" font-size="10" font-weight="600" fill="#1e293b" text-anchor="middle">AC-CE (+)</text>
+        <text x="${center}" y="${size - 6}" font-size="10" font-weight="600" fill="#1e293b" text-anchor="middle">AC-CE (-)</text>
+        <text x="6" y="${center - 6}" font-size="10" font-weight="600" fill="#1e293b" text-anchor="start">AE-RO (-)</text>
+        <text x="${size - 6}" y="${center - 6}" font-size="10" font-weight="600" fill="#1e293b" text-anchor="end">AE-RO (+)</text>
+
+        <!-- Quadrant labels -->
+        <text x="${center / 2}" y="${center / 2}" font-size="11" font-weight="700" fill="#ef4444" text-anchor="middle">Accommodative</text>
+        <text x="${center + center / 2}" y="${center / 2}" font-size="11" font-weight="700" fill="#6366f1" text-anchor="middle">Divergent</text>
+        <text x="${center / 2}" y="${center + center / 2}" font-size="11" font-weight="700" fill="#f59e0b" text-anchor="middle">Convergent</text>
+        <text x="${center + center / 2}" y="${center + center / 2}" font-size="11" font-weight="700" fill="#14b8a6" text-anchor="middle">Assimilative</text>
+
+        <!-- User position -->
+        <circle cx="${plotX}" cy="${plotY}" r="14" fill="none" stroke="${styleColor}" stroke-width="2" opacity="0.5" />
+        <circle cx="${plotX}" cy="${plotY}" r="10" fill="${styleColor}" stroke="white" stroke-width="3" />
+      `;
+            }
+
+            // Start the app
+            init();
+        </script>
+    </body>
+</html>
